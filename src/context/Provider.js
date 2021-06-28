@@ -18,7 +18,6 @@ const initialState = {
     order: { column: 'name', sort: 'ASC' },
   },
 };
-
 class Provider extends Component {
   constructor(props) {
     super(props);
@@ -26,10 +25,56 @@ class Provider extends Component {
     this.getStarWarsAPI = this.getStarWarsAPI.bind(this);
     this.changeInputsByName = this.changeInputsByName.bind(this);
     this.filterByName = this.filterByName.bind(this);
+    this.changeSelectColumn = this.changeSelectColumn.bind(this);
+    this.changeSelectComparison = this.changeSelectComparison.bind(this);
+    this.changeSelectValue = this.changeSelectValue.bind(this);
+    this.handleFilterByNumericValues = this.handleFilterByNumericValues.bind(this);
+    this.handleRemoveFilter = this.handleRemoveFilter.bind(this);
+    this.sortPlanets = this.sortPlanets.bind(this);
   }
 
   componentDidMount() {
-    this.getStarWarsAPI(); // assim que renderizar a tabela !
+    this.getStarWarsAPI();
+  }
+
+  handleFilterByNumericValues() {
+    const {
+      filters: { filterByNumericsCurrency }, data } = this.state;
+    const { column, comparison, value } = filterByNumericsCurrency;
+    this.setState((state) => ({
+      filters: { ...state.filters,
+        filterByNumericValues: [
+          ...state.filters.filterByNumericValues,
+          filterByNumericsCurrency,
+        ],
+      },
+    }));
+    const filteredData = data.filter((curr) => {
+      if (comparison === 'maior que') {
+        return Number(curr[column]) > Number(value);
+      }
+      if (comparison === 'menor que') {
+        return Number(curr[column]) < Number(value);
+      }
+      if (comparison === 'igual a') return curr[column] === value;
+      return true;
+    });
+    this.setState({ data: filteredData });
+  }
+
+  handleRemoveFilter() {
+    const { filters: { filterByNumericValues }, filters } = this.state;
+    if (filterByNumericValues.length) {
+      const previousFilters = filterByNumericValues.pop();
+      this.setState(
+        {
+          filters: {
+            ...filters, filterByNumericValues: previousFilters,
+          },
+        },
+      );
+    }
+    this.getStarWarsAPI();
   }
 
   getStarWarsAPI() {
@@ -39,30 +84,27 @@ class Provider extends Component {
     fetchStarWars()
       .then((response) => {
         const { results } = response;
-        // a requisição (mock) retorna 14 chaves em cada planeta,
-        // mas a chave `residents` não deve ser exibida totalizando 13 colunas.
-        results.forEach((starwars) => delete starwars.residents);
-        this.setState({ isFetching: false, data: results, // mudança do estado do fet e do data
+        results.forEach((starwars) => delete starwars.residents); // pedido no teste, remover a chave residents
+        this.setState({ isFetching: false, data: results,
         });
-        // this.sortPlanets();
+        this.sortPlanets(); // funçao que organiza os planetas em ordem ascendente ou descendente, linha 171
       }, (error) => {
         this.setState({
-          isFetching: false, error: error.message, // em caso de erro da API
+          isFetching: false, error: error.message,
         });
       });
   }
 
-  filterByName(name) { // Filtre a tabela através de um texto, inserido num campo de texto, 
-    // exibindo somente os planetas cujos nomes incluam o texto digitado
-    const { data } = this.state;
-    const filteredData = data.filter((curr) => curr.name.includes(name));
-    this.setState({ data: filteredData });
-    if (name === '') {
-      this.getStarWarsAPI();
-    }
+  getValue(currency, nexting) {
+    const cur = currency.match(/^[0-9]+$/) ? Number(currency) : currency;
+    const nex = nexting.match(/^[0-9]+$/) ? Number(nexting) : nexting;
+    return {
+      cur,
+      nex,
+    };
   }
 
-  changeInputsByName({ target }) {
+  changeInputsByName({ target }) { // guardando os valores digitados no input de name, pesquisa por nome, req 2
     const { name, value } = target;
     this.setState((state) => ({
       ...state,
@@ -76,13 +118,78 @@ class Provider extends Component {
     this.filterByName(value);
   }
 
-  filterByName(name) {
+  changeSelectColumn({ target }) {
+    const { value } = target;
+    this.setState((state) => ({
+      filters: {
+        ...state.filters,
+        filterByNumericsCurrency: {
+          ...state.filters.filterByNumericsCurrency,
+          column: value,
+        },
+      },
+    }));
+  }
+
+  changeSelectComparison({ target }) {
+    const { value } = target;
+    this.setState((state) => ({
+      filters: {
+        ...state.filters,
+        filterByNumericsCurrency: {
+          ...state.filters.filterByNumericsCurrency,
+          comparison: value,
+        },
+      },
+    }));
+  }
+
+  changeSelectValue({ target }) {
+    const { value } = target;
+    this.setState((state) => ({
+      filters: {
+        ...state.filters,
+        filterByNumericsCurrency: {
+          ...state.filters.filterByNumericsCurrency,
+          value,
+        },
+      },
+    }));
+  }
+
+  filterByName(name) { // compoe o filtro por name na funçao changeinputsname, linha 118
     const { data } = this.state;
     const filteredData = data.filter((curr) => curr.name.includes(name));
+    // https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Array/includes
     this.setState({ data: filteredData });
     if (name === '') {
-      this.getStarWarsAPI();
+      this.getStarWarsAPI(); // caso nada digitado, retornar os valores da API inicial
     }
+  }
+
+  sortPlanets() { // organizaçao dos planetas, ascendente ou descendente, req 6
+    const { filters: { order: { column, sort } }, data } = this.state;
+    let sortedData = [];
+    const negative = -1;
+    const positive = 1;
+    const nullo = 0;
+    if (sort === 'ASC') {
+      sortedData = data.sort((curr, next) => {
+        const { cur, nex } = this.getValue(curr[column], next[column]);
+        if (cur > nex) return positive;
+        if (cur < nex) return negative;
+        return nullo;
+      });
+    }
+    if (sort === 'DESC') {
+      sortedData = data.sort((curr, next) => {
+        const { cur, nex } = this.getValue(curr[column], next[column]);
+        if (cur > nex) return negative;
+        if (cur < nex) return positive;
+        return nullo;
+      });
+    }
+    this.setState({ data: sortedData });
   }
 
   render() {
@@ -90,6 +197,14 @@ class Provider extends Component {
       ...this.state,
       getStarWarsAPI: this.getStarWarsAPI,
       changeInputsByName: this.changeInputsByName,
+      changeSelectColumn: this.changeSelectColumn,
+      changeSelectComparison: this.changeSelectComparison,
+      changeSelectValue: this.changeSelectValue,
+      handleFilterByNumericValues: this.handleFilterByNumericValues,
+      handleRemoveFilter: this.handleRemoveFilter,
+      changeSortType: this.changeSortType,
+      sortPlanets: this.sortPlanets,
+      changeSortColumn: this.changeSortColumn,
     };
     const { children } = this.props;
     return (

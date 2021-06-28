@@ -12,8 +12,8 @@ function Header() {
     handleFilterByNumericValues,
   } = useContext(StarWarsContext);
 
-  const { filterByName: { name } } = filters;
-  const columns = [
+  const { filterByName: { name } } = filters; // req 2, gerenciamento do estado pedido no requisito.
+  const columns = [ // array com opçoes do select de pesquisa por numero de:
     'population',
     'orbital_period',
     'diameter',
@@ -29,8 +29,8 @@ function Header() {
           data-testid="name-filter"
           name="name"
           id="name"
-          value={ name }
-          onChange={ (event) => changeInputsByName(event) } // provider linha 55, req 2
+          value={ name } // ligação com o objeto da linha 15
+          onChange={ (event) => changeInputsByName(event) } // context > provider, linha 107, req 2
         />
       </label>
       <div>
@@ -38,9 +38,11 @@ function Header() {
         <select
           name="column"
           data-testid="column-filter"
-          onChange={ changeSelectColumn }
+          onChange={ changeSelectColumn } // context > provider, linha 121, req 3
+          // abrir um dropdown que permita a quem usa selecionar uma das
+          // seguintes colunas: population, orbital_period, diameter, rotation_period e surface_water.
         >
-          {columns.map((column) => (
+          {columns.map((column) => ( // mapeando as opçoes do select, array linha 16
             <option key={ column } value={ column }>
               { column }
             </option>
@@ -49,7 +51,7 @@ function Header() {
         <select
           name="comparison"
           data-testid="comparison-filter"
-          onChange={ changeSelectComparison }
+          onChange={ changeSelectComparison } // context > provider, linha 134, req 3
         >
           <option>selecione</option>
           <option value="maior que">maior que</option>
@@ -60,12 +62,12 @@ function Header() {
           name="value"
           type="number"
           data-testid="value-filter"
-          onChange={ changeSelectValue }
+          onChange={ changeSelectValue } // context > provider, linha 147, req 3
         />
         <button
           type="button"
           data-testid="button-filter"
-          onClick={ handleFilterByNumericValues }
+          onClick={ handleFilterByNumericValues } // context > provider, linha 147, req 3
         >
           Pesquisar
         </button>
