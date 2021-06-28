@@ -88,17 +88,17 @@ class Provider extends Component {
         },
       },
     }));
-    this.filterByName(value);
+    this.filterByName(value); // linha 133
   }
 
-  changeSelectColumn({ target }) {
-    const { value } = target;
+  changeSelectColumn({ target }) { // filtro por coluna, population, orbital_period, diameter, rotation_period, surface_water
+    const { value } = target; // objeto contido em filters na linha 10
     this.setState((state) => ({
       filters: {
         ...state.filters,
         filterByNumericsCurrency: {
           ...state.filters.filterByNumericsCurrency,
-          column: value,
+          column: value, // atribuindo a coluna escolhida
         },
       },
     }));
@@ -111,13 +111,13 @@ class Provider extends Component {
         ...state.filters,
         filterByNumericsCurrency: {
           ...state.filters.filterByNumericsCurrency,
-          comparison: value,
+          comparison: value, // atribuindo o valor numerico digitado
         },
       },
     }));
   }
 
-  changeSelectValue({ target }) {
+  changeSelectValue({ target }) { // guardando valor numerico digitado no input
     const { value } = target;
     this.setState((state) => ({
       filters: {
@@ -130,7 +130,7 @@ class Provider extends Component {
     }));
   }
 
-  filterByName(name) { // compoe o filtro por name na funçao changeinputsname, linha 118
+  filterByName(name) { // compoe o filtro por name na funçao changeinputsname, linha 80
     const { data } = this.state;
     const filteredData = data.filter((curr) => curr.name.includes(name));
     // https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Array/includes

@@ -30,7 +30,7 @@ function Header() {
           name="name"
           id="name"
           value={ name } // ligação com o objeto da linha 15
-          onChange={ (event) => changeInputsByName(event) } // context > provider, linha 107, req 2
+          onChange={ (event) => changeInputsByName(event) } // context > provider, linha 80, req 2
         />
       </label>
       <div>
@@ -38,7 +38,7 @@ function Header() {
         <select
           name="column"
           data-testid="column-filter"
-          onChange={ changeSelectColumn } // context > provider, linha 121, req 3
+          onChange={ changeSelectColumn } // context > provider, linha 94, req 3
           // abrir um dropdown que permita a quem usa selecionar uma das
           // seguintes colunas: population, orbital_period, diameter, rotation_period e surface_water.
         >
