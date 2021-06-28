@@ -18,6 +18,7 @@ const initialState = {
     order: { column: 'name', sort: 'ASC' },
   },
 };
+
 class Provider extends Component {
   constructor(props) {
     super(props);
@@ -28,22 +29,7 @@ class Provider extends Component {
   }
 
   componentDidMount() {
-    this.getStarWarsAPI();
-  }
-
-  handleRemoveFilter() {
-    const { filters: { filterByNumericValues }, filters } = this.state;
-    if (filterByNumericValues.length) {
-      const previousFilters = filterByNumericValues.pop();
-      this.setState(
-        {
-          filters: {
-            ...filters, filterByNumericValues: previousFilters,
-          },
-        },
-      );
-    }
-    this.getStarWarsAPI();
+    this.getStarWarsAPI(); // assim que renderizar a tabela !
   }
 
   getStarWarsAPI() {
@@ -53,24 +39,27 @@ class Provider extends Component {
     fetchStarWars()
       .then((response) => {
         const { results } = response;
+        // a requisição (mock) retorna 14 chaves em cada planeta,
+        // mas a chave `residents` não deve ser exibida totalizando 13 colunas.
         results.forEach((starwars) => delete starwars.residents);
-        this.setState({ isFetching: false, data: results,
+        this.setState({ isFetching: false, data: results, // mudança do estado do fet e do data
         });
         // this.sortPlanets();
       }, (error) => {
         this.setState({
-          isFetching: false, error: error.message,
+          isFetching: false, error: error.message, // em caso de erro da API
         });
       });
   }
 
-  getValue(currency, nexting) {
-    const cur = currency.match(/^[0-9]+$/) ? Number(currency) : currency;
-    const nex = nexting.match(/^[0-9]+$/) ? Number(nexting) : nexting;
-    return {
-      cur,
-      nex,
-    };
+  filterByName(name) { // Filtre a tabela através de um texto, inserido num campo de texto, 
+    // exibindo somente os planetas cujos nomes incluam o texto digitado
+    const { data } = this.state;
+    const filteredData = data.filter((curr) => curr.name.includes(name));
+    this.setState({ data: filteredData });
+    if (name === '') {
+      this.getStarWarsAPI();
+    }
   }
 
   changeInputsByName({ target }) {
