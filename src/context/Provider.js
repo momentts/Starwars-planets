@@ -15,7 +15,6 @@ const initialState = {
       comparison: 'maior que',
       value: '0',
     },
-    order: { column: 'name', sort: 'ASC' },
   },
 };
 class Provider extends Component {
@@ -29,8 +28,6 @@ class Provider extends Component {
     this.changeSelectComparison = this.changeSelectComparison.bind(this);
     this.changeSelectValue = this.changeSelectValue.bind(this);
     this.handleFilterByNumericValues = this.handleFilterByNumericValues.bind(this);
-    this.handleRemoveFilter = this.handleRemoveFilter.bind(this);
-    this.sortPlanets = this.sortPlanets.bind(this);
   }
 
   componentDidMount() {
@@ -87,21 +84,12 @@ class Provider extends Component {
         results.forEach((starwars) => delete starwars.residents); // pedido no teste, remover a chave residents
         this.setState({ isFetching: false, data: results,
         });
-        this.sortPlanets(); // funçao que organiza os planetas em ordem ascendente ou descendente, linha 171
+        // this.sortPlanets(); // funçao que organiza os planetas em ordem ascendente ou descendente, linha 171
       }, (error) => {
         this.setState({
           isFetching: false, error: error.message,
         });
       });
-  }
-
-  getValue(currency, nexting) {
-    const cur = currency.match(/^[0-9]+$/) ? Number(currency) : currency;
-    const nex = nexting.match(/^[0-9]+$/) ? Number(nexting) : nexting;
-    return {
-      cur,
-      nex,
-    };
   }
 
   changeInputsByName({ target }) { // guardando os valores digitados no input de name, pesquisa por nome, req 2
@@ -167,31 +155,6 @@ class Provider extends Component {
     }
   }
 
-  sortPlanets() { // organizaçao dos planetas, ascendente ou descendente, req 6
-    const { filters: { order: { column, sort } }, data } = this.state;
-    let sortedData = [];
-    const negative = -1;
-    const positive = 1;
-    const nullo = 0;
-    if (sort === 'ASC') {
-      sortedData = data.sort((curr, next) => {
-        const { cur, nex } = this.getValue(curr[column], next[column]);
-        if (cur > nex) return positive;
-        if (cur < nex) return negative;
-        return nullo;
-      });
-    }
-    if (sort === 'DESC') {
-      sortedData = data.sort((curr, next) => {
-        const { cur, nex } = this.getValue(curr[column], next[column]);
-        if (cur > nex) return negative;
-        if (cur < nex) return positive;
-        return nullo;
-      });
-    }
-    this.setState({ data: sortedData });
-  }
-
   render() {
     const contextValue = {
       ...this.state,
@@ -202,9 +165,6 @@ class Provider extends Component {
       changeSelectValue: this.changeSelectValue,
       handleFilterByNumericValues: this.handleFilterByNumericValues,
       handleRemoveFilter: this.handleRemoveFilter,
-      changeSortType: this.changeSortType,
-      sortPlanets: this.sortPlanets,
-      changeSortColumn: this.changeSortColumn,
     };
     const { children } = this.props;
     return (
