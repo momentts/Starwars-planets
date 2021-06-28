@@ -21,9 +21,9 @@ class Provider extends Component {
   constructor(props) {
     super(props);
     this.state = initialState;
-    this.getStarWarsAPI = this.getStarWarsAPI.bind(this);
-    this.changeInputsByName = this.changeInputsByName.bind(this);
-    this.filterByName = this.filterByName.bind(this);
+    this.getStarWarsAPI = this.getStarWarsAPI.bind(this); // chamada da API que vamos trabalhar
+    this.changeInputsByName = this.changeInputsByName.bind(this); // valores digitados nos inputs
+    this.filterByName = this.filterByName.bind(this); // filtro por nome pedido no req 2
     this.changeSelectColumn = this.changeSelectColumn.bind(this);
     this.changeSelectComparison = this.changeSelectComparison.bind(this);
     this.changeSelectValue = this.changeSelectValue.bind(this);
@@ -34,7 +34,7 @@ class Provider extends Component {
     this.getStarWarsAPI();
   }
 
-  handleFilterByNumericValues() {
+  handleFilterByNumericValues() { // req 3, criar um filtro de valores numericos
     const {
       filters: { filterByNumericsCurrency }, data } = this.state;
     const { column, comparison, value } = filterByNumericsCurrency;
@@ -46,7 +46,7 @@ class Provider extends Component {
         ],
       },
     }));
-    const filteredData = data.filter((curr) => {
+    const filteredData = data.filter((curr) => { // filtros pedidos no req 3
       if (comparison === 'maior que') {
         return Number(curr[column]) > Number(value);
       }
@@ -56,22 +56,7 @@ class Provider extends Component {
       if (comparison === 'igual a') return curr[column] === value;
       return true;
     });
-    this.setState({ data: filteredData });
-  }
-
-  handleRemoveFilter() {
-    const { filters: { filterByNumericValues }, filters } = this.state;
-    if (filterByNumericValues.length) {
-      const previousFilters = filterByNumericValues.pop();
-      this.setState(
-        {
-          filters: {
-            ...filters, filterByNumericValues: previousFilters,
-          },
-        },
-      );
-    }
-    this.getStarWarsAPI();
+    this.setState({ data: filteredData }); // data, que é um array vazio vai receber os valores correspondentes aos filtros
   }
 
   getStarWarsAPI() {
@@ -164,7 +149,6 @@ class Provider extends Component {
       changeSelectComparison: this.changeSelectComparison,
       changeSelectValue: this.changeSelectValue,
       handleFilterByNumericValues: this.handleFilterByNumericValues,
-      handleRemoveFilter: this.handleRemoveFilter,
     };
     const { children } = this.props;
     return (
