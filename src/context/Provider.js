@@ -21,9 +21,9 @@ class Provider extends Component {
   constructor(props) {
     super(props);
     this.state = initialState;
-    this.getStarWarsAPI = this.getStarWarsAPI.bind(this); // chamada da API que vamos trabalhar
+    this.getStarWarsAPI = this.getStarWarsAPI.bind(this); // chamada da AP
     this.changeInputsByName = this.changeInputsByName.bind(this); // valores digitados nos inputs
-    this.filterByName = this.filterByName.bind(this); // filtro por nome pedido no req 2
+    this.filterByName = this.filterByName.bind(this);
     this.changeSelectColumn = this.changeSelectColumn.bind(this);
     this.changeSelectComparison = this.changeSelectComparison.bind(this);
     this.changeSelectValue = this.changeSelectValue.bind(this);
@@ -34,7 +34,7 @@ class Provider extends Component {
     this.getStarWarsAPI();
   }
 
-  handleFilterByNumericValues() { // req 3, criar um filtro de valores numericos
+  handleFilterByNumericValues() {
     const {
       filters: { filterByNumericsCurrency }, data } = this.state;
     const { column, comparison, value } = filterByNumericsCurrency;
@@ -46,7 +46,7 @@ class Provider extends Component {
         ],
       },
     }));
-    const filteredData = data.filter((curr) => { // filtros pedidos no req 3
+    const filteredData = data.filter((curr) => {
       if (comparison === 'maior que') {
         return Number(curr[column]) > Number(value);
       }
@@ -56,7 +56,7 @@ class Provider extends Component {
       if (comparison === 'igual a') return curr[column] === value;
       return true;
     });
-    this.setState({ data: filteredData }); // data, que é um array vazio vai receber os valores correspondentes aos filtros
+    this.setState({ data: filteredData });
   }
 
   getStarWarsAPI() {
@@ -66,10 +66,9 @@ class Provider extends Component {
     fetchStarWars()
       .then((response) => {
         const { results } = response;
-        results.forEach((starwars) => delete starwars.residents); // pedido no teste, remover a chave residents
+        results.forEach((starwars) => delete starwars.residents);
         this.setState({ isFetching: false, data: results,
         });
-        // this.sortPlanets(); // funçao que organiza os planetas em ordem ascendente ou descendente, linha 171
       }, (error) => {
         this.setState({
           isFetching: false, error: error.message,
@@ -77,7 +76,7 @@ class Provider extends Component {
       });
   }
 
-  changeInputsByName({ target }) { // guardando os valores digitados no input de name, pesquisa por nome, req 2
+  changeInputsByName({ target }) { // guardando os valores digitados no input de name, pesquisa por nome
     const { name, value } = target;
     this.setState((state) => ({
       ...state,
@@ -92,7 +91,7 @@ class Provider extends Component {
   }
 
   changeSelectColumn({ target }) { // filtro por coluna, population, orbital_period, diameter, rotation_period, surface_water
-    const { value } = target; // objeto contido em filters na linha 10
+    const { value } = target;
     this.setState((state) => ({
       filters: {
         ...state.filters,
